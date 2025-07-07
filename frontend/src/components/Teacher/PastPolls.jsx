@@ -12,7 +12,9 @@ const PastPolls = () => {
     const fetchPastPolls = async () => {
       try {
         setLoading(true);
-        const response = await axios.get('http://localhost:5000/api/polls');
+        const response = await axios.get(
+          'https://teastupoll.onrender.com/api/polls'
+        );
         setPolls(response.data || []);
       } catch (err) {
         setError(
