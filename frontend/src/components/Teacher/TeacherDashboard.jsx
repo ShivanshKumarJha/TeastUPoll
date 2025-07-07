@@ -36,10 +36,13 @@ const TeacherDashboard = () => {
         </div>
       </main>
 
+      {/* Chat Popup */}
       <ChatPopup
         isOpen={chatOpen}
         onClose={() => setChatOpen(false)}
-        userType="teacher"
+        userType="student"
+        userId="teacher1"
+        userName="Teacher"
       />
     </div>
   );

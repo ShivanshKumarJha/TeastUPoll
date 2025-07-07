@@ -5,6 +5,7 @@ const cors = require('cors');
 const connectDB = require('./config/db');
 const Poll = require('./models/Poll');
 const Student = require('./models/Student');
+const ChatMessage = require('./models/ChatMessage');
 const {
   createPoll,
   submitAnswer,
@@ -15,7 +16,7 @@ const {
   registerStudent,
   updateStudentSocket,
   kickStudent,
-  getActiveStudents
+  getActiveStudents,
 } = require('./controllers/studentController');
 
 require('dotenv').config();
@@ -37,6 +38,7 @@ app.use('/api', require('./routes/api'));
 
 // Active poll in memory for real-time performance
 let activePoll = null;
+const { saveMessage, getChatHistory } = require('./controllers/chatController');
 
 io.on('connection', socket => {
   console.log(`New connection: ${socket.id}`);
@@ -130,13 +132,19 @@ io.on('connection', socket => {
       const student = await Student.findOne({ token });
 
       if (student) {
-        // Delete the student
+        // Step 1: Delete all chat messages by this student
+        await ChatMessage.deleteMany({ senderId: token });
+
+        // Step 2: Delete the student record
         await Student.deleteOne({ token });
 
-        // Emit to specific student that they've been kicked
+        // Step 3: Notify all clients to remove messages from this student
+        io.emit('removeUserMessages', { senderId: token });
+
+        // Step 4: Emit to specific student that they've been kicked
         io.to(student.socketId).emit('kicked');
 
-        // Notify all clients to update student list
+        // Step 5: Notify all clients to update student list
         io.emit('studentKicked', token);
       }
     } catch (err) {
@@ -151,6 +159,48 @@ io.on('connection', socket => {
       socket.emit('activeStudents', students);
     } catch (err) {
       console.error('Error getting active students:', err);
+    }
+  });
+
+  // Send chat history to new connection
+  socket.on('requestChatHistory', async () => {
+    try {
+      const history = await getChatHistory();
+      socket.emit('chatHistory', history.reverse()); // Reverse to show oldest first
+    } catch (err) {
+      console.error('Error sending chat history:', err);
+    }
+  });
+
+  // Handle new chat messages
+  socket.on('sendChatMessage', async messageData => {
+    try {
+      // Save message to database
+      const savedMessage = await saveMessage(messageData);
+
+      // Broadcast to all connected clients
+      io.emit('newChatMessage', savedMessage);
+    } catch (err) {
+      console.error('Error handling chat message:', err);
+    }
+  });
+
+  // Handle logout (voluntary disconnect)
+  socket.on('logout', async token => {
+    try {
+      // Delete all chat messages by this user
+      await ChatMessage.deleteMany({ senderId: token });
+
+      // Delete student record
+      await Student.deleteOne({ token });
+
+      // Notify all clients to remove messages
+      io.emit('removeUserMessages', { senderId: token });
+
+      // Notify user they've been logged out
+      socket.emit('loggedOut');
+    } catch (err) {
+      console.error('Logout error:', err);
     }
   });
 

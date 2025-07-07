@@ -38,6 +38,12 @@ const StudentDashboard = () => {
         localStorage.removeItem('studentToken');
       };
 
+      const handleLoggedOut = () => {
+        localStorage.removeItem('studentToken');
+        setToken('');
+        setName('');
+      };
+
       socket.on('kicked', handleKicked);
 
       socket.on('newPoll', newPoll => {
@@ -51,11 +57,14 @@ const StudentDashboard = () => {
         setHasAnswered(true);
       });
 
+      socket.on('loggedOut', handleLoggedOut);
+
       return () => {
         socket.off('kicked', handleKicked);
         socket.off('newPoll');
         socket.off('updateResults');
         socket.off('pollEnded');
+        socket.off('loggedOut', handleLoggedOut);
       };
     }
   }, [socket]);
@@ -171,13 +180,13 @@ const StudentDashboard = () => {
       </main>
 
       {/* Chat Popup */}
-      {token && (
-        <ChatPopup
-          isOpen={chatOpen}
-          onClose={() => setChatOpen(false)}
-          userType="student"
-        />
-      )}
+      <ChatPopup
+        isOpen={chatOpen}
+        onClose={() => setChatOpen(false)}
+        userType="student"
+        userId={token}
+        userName={name}
+      />
     </div>
   );
 };
