@@ -2,11 +2,11 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://your-render-app.onrender.com/api/$1"
+      "destination": "https://teastupoll.onrender.com/api/$1"
     },
     {
       "source": "/socket.io/(.*)",
-      "destination": "https://your-render-app.onrender.com/socket.io/$1"
+      "destination": "https://teastupoll.onrender.com/socket.io/$1"
     }
   ]
 }

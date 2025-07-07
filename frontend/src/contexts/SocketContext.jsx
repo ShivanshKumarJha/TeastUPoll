@@ -7,8 +7,9 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     console.log('Attempting to connect to socket server...');
-    const newSocket = io('http://localhost:5000', {
+    const newSocket = io(import.meta.env.VITE_BACKEND_URL, {
       transports: ['websocket', 'polling'],
+      withCredentials: true,
     });
 
     newSocket.on('connect', () => {
