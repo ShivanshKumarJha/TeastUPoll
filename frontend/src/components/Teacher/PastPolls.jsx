@@ -115,7 +115,7 @@ const PastPolls = () => {
                     {/* Option Label (left-aligned) */}
                     <span
                       className={`z-10 ${
-                        percentage === 100 ? 'text-white' : 'text-black'
+                        percentage > 30 ? 'text-white' : 'text-black'
                       }`}
                     >
                       {`${getOptionLabel(index)}. ${result.option}`}
@@ -124,7 +124,7 @@ const PastPolls = () => {
                     {/* Percentage (right-aligned) */}
                     <span
                       className={`z-10 ${
-                        percentage === 0 ? 'text-black' : 'text-white'
+                        percentage > 70 ? 'text-white' : 'text-black'
                       }`}
                     >
                       {percentage}%
