@@ -10,6 +10,10 @@ export const SocketProvider = ({ children }) => {
     const newSocket = io(import.meta.env.VITE_BACKEND_URL, {
       transports: ['websocket', 'polling'],
       withCredentials: true,
+      reconnection: true,
+      reconnectionAttempts: Infinity,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
     });
 
     newSocket.on('connect', () => {
