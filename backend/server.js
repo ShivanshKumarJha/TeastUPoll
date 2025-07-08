@@ -25,11 +25,15 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: ['https://teastupoll.vercel.app', 'http://localhost:5173'],
+    origin: [
+      'https://teastupoll.vercel.app',
+      'http://localhost:5173',
+      'https://teastupoll.onrender.com',
+    ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
   },
-}); 
+});
 
 connectDB();
 
