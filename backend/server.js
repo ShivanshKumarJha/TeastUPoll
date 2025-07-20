@@ -6,6 +6,7 @@ const connectDB = require('./config/db');
 const Poll = require('./models/Poll');
 const Student = require('./models/Student');
 const ChatMessage = require('./models/ChatMessage');
+const { FRONTEND_URL } = require('./config/environments');
 const {
   createPoll,
   submitAnswer,
@@ -29,6 +30,7 @@ const io = socketIo(server, {
       'https://teastupoll.vercel.app',
       'http://localhost:5173',
       'https://teastupoll.onrender.com',
+      FRONTEND_URL || 'https://white-flower-0854c291e.2.azurestaticapps.net',
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
