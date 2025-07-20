@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSocket } from '../../hooks/useSocket';
 import CountdownTimer from '../common/CountdownTimer';
-import Button from '../common/Button';
 
 const AnswerPoll = ({ poll, token, name }) => {
   const [selectedOption, setSelectedOption] = useState(null);

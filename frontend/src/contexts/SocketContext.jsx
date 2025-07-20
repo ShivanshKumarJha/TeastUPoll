@@ -7,7 +7,7 @@ export const SocketProvider = ({ children }) => {
 
   useEffect(() => {
     console.log('Attempting to connect to socket server...');
-    const newSocket = io(import.meta.env.VITE_BACKEND_URL, {
+    const newSocket = io(import.meta.env.REACT_APP_API_ADDRESS, {
       transports: ['websocket', 'polling'],
       withCredentials: true,
       reconnection: true,
