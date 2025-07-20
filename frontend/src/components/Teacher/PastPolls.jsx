@@ -13,7 +13,7 @@ const PastPolls = () => {
       try {
         setLoading(true);
         const response = await axios.get(
-          'https://teastupoll.onrender.com/api/polls'
+          'https://teastupoll.azurewebsites.net/api/polls'
         );
         setPolls(response.data || []);
       } catch (err) {
