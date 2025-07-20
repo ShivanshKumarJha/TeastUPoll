@@ -2,6 +2,9 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const cors = require('cors');
+const path = require('path');
+const { useAzureSocketIO } = require('@azure/web-pubsub-socket.io');
+
 const connectDB = require('./config/db');
 const Poll = require('./models/Poll');
 const Student = require('./models/Student');
@@ -37,13 +40,34 @@ const io = socketIo(server, {
   },
 });
 
+useAzureSocketIO(io, {
+  connectionString: process.env.WebPubSubConnectionString,
+  hub: 'pollHub',
+  cors: {
+    origin: [
+      'https://teastupoll.vercel.app',
+      'http://localhost:5173',
+      'https://teastupoll.onrender.com',
+      FRONTEND_URL || 'https://white-flower-0854c291e.2.azurestaticapps.net',
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+    credentials: true,
+  },
+});
+
 connectDB();
 
 app.use(cors());
 app.use(express.json());
+
 app.use('/api', require('./routes/api'));
 
-// Active poll in memory for real-time performance
+const frontendPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendPath));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(frontendPath, 'index.html'));
+});
+
 let activePoll = null;
 const { saveMessage, getChatHistory } = require('./controllers/chatController');
 
@@ -215,11 +239,6 @@ io.on('connection', socket => {
   socket.on('disconnect', () => {
     console.log(`Disconnected: ${socket.id}`);
   });
-});
-
-app.use(express.static('../frontend/dist'));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist/index.html'));
 });
 
 const PORT = process.env.PORT || 5000;

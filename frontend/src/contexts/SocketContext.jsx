@@ -8,6 +8,7 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     console.log('Attempting to connect to socket server...');
     const newSocket = io(import.meta.env.REACT_APP_API_ADDRESS, {
+      path: '/clients/socketio/hubs/Hub',
       transports: ['websocket', 'polling'],
       withCredentials: true,
       reconnection: true,
