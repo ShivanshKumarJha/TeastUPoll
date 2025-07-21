@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useSocket } from '../../hooks/useSocket'; // Adjust path as needed
+import { pollAPI } from '../../services/api';
+import { useSocket } from '../../hooks/useSocket';
 
 const PastPolls = () => {
   const [polls, setPolls] = useState([]);
@@ -12,10 +12,8 @@ const PastPolls = () => {
     const fetchPastPolls = async () => {
       try {
         setLoading(true);
-        const response = await axios.get(
-          'https://teastupoll.azurewebsites.net/api/polls'
-        );
-        setPolls(response.data || []);
+        const polls = await pollAPI.getPastPolls();
+        setPolls(polls || []);
       } catch (err) {
         setError(
           'Failed to fetch past polls. Please make sure the server is running.'

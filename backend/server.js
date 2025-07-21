@@ -27,6 +27,8 @@ require('dotenv').config();
 
 const app = express();
 const server = http.createServer(app);
+
+// Configure Socket.IO with Azure Web PubSub
 const io = socketIo(server, {
   cors: {
     origin: [
@@ -40,10 +42,33 @@ const io = socketIo(server, {
   },
 });
 
-useAzureSocketIO(io, {
-  connectionString: process.env.WebPubSubConnectionString,
-  hub: 'pollHub',
-  cors: {
+// Configure Azure Web PubSub for Socket.IO
+if (process.env.WebPubSubConnectionString) {
+  useAzureSocketIO(io, {
+    connectionString: process.env.WebPubSubConnectionString,
+    hub: 'pollHub',
+    cors: {
+      origin: [
+        'https://teastupoll.vercel.app',
+        'http://localhost:5173',
+        'https://teastupoll.onrender.com',
+        FRONTEND_URL || 'https://white-flower-0854c291e.2.azurestaticapps.net',
+      ],
+      methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+      credentials: true,
+    },
+  });
+  console.log('Azure Web PubSub configured with connection string');
+} else {
+  console.log(
+    'No Azure Web PubSub connection string found, using regular Socket.IO'
+  );
+}
+
+connectDB();
+
+app.use(
+  cors({
     origin: [
       'https://teastupoll.vercel.app',
       'http://localhost:5173',
@@ -52,12 +77,8 @@ useAzureSocketIO(io, {
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
     credentials: true,
-  },
-});
-
-connectDB();
-
-app.use(cors());
+  })
+);
 app.use(express.json());
 
 app.use('/api', require('./routes/api'));
